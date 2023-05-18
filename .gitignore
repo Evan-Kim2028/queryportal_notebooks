@@ -160,3 +160,6 @@ cython_debug/
 #.idea/
 
 /*.parquet
+
+/ohm_data_exploration/*
+/uni_bal_old/*
