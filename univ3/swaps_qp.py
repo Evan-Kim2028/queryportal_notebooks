@@ -1,4 +1,5 @@
 from queryportal.subgraphinterface import SubgraphInterface
+from datetime import datetime, timedelta
 
 import polars as pl
 pl.Config.set_fmt_str_lengths(200)
@@ -20,21 +21,29 @@ univ3_dict = sgi.subject.getQueryPaths(sgi.subject.subgraphs['uniswap-v3-ethereu
 # print fields for swaps entity
 print(f'my dict fields for univ3_decentralized swaps entity: {list(univ3_dict.keys())}')
 
- # NOTE - getting bad gateway 502 error for some column data corruption here after larger query size (~15000)
+# there appears to be something corrupted in these fieldpaths...
+# query_paths = ['hash', 'to', 'from', 'blockNumber', 'timestamp', 'tokenIn', 'amountIn', 'amountInUSD', 'tokenOut', 'amountOut', 'amountOutUSD', 'pool']
+
 query_paths = [
-               'hash', 
-               'from', 
-               'to',
-               'pool_name', 
-               'blockNumber', 
-               'timestamp', 
-               'tokenIn_symbol', 
-               'amountIn', 
-               'amountInUSD', 
-               'tokenOut_symbol', 
-               'amountOut', 
-               'amountOutUSD'
-               ]
+    'hash',
+    'to',
+    'from',
+    'blockNumber',
+    'timestamp',
+    'tokenIn_symbol',
+    'tokenOut_symbol',
+    'amountIn',
+    'amountOut',
+    'pool_id'
+]
+
+filter = {
+    'timestamp_gte': int((datetime(2023, 5, 17).timestamp())),
+    'timestamp_lte': int(datetime(2023, 5, 18).timestamp()),
+    # 'amountInUSD_gte': 10,
+    # 'amountOutUSD_gte': 10
+    # 'hash': "0xb2d071e74709bddc8ab005aa42ce4251ad77453fed195f856b46d055c88cb556"
+}
 
 query_size = 100000
 
@@ -43,8 +52,10 @@ univ3 = sgi.query_entity(
     entity='swaps',
     name='uniswap-v3-ethereum', 
     query_paths=query_paths,
+    filter_dict = filter,
+    orderBy='timestamp',
     saved_file_name='univ3_swaps'
     )
 
 
-print(univ3.head(5))
+print(univ3.shape[0])
