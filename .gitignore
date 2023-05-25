@@ -163,3 +163,4 @@ cython_debug/
 
 /ohm_data_exploration/*
 /uni_bal_old/*
+/data/*
